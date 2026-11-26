@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RiboTrafik — mRNA Ribosome Traffic & Co-Translational Folding Studio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@600;700&display=swap"
+    rel="stylesheet"
+  />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-mark" aria-hidden="true">
+        <span class="dot-ribosome"></span>
+        <span class="dot-ribosome"></span>
+      </div>
+      <div>
+        <h1 class="brand-title" data-i18n="appTitle">RiboTrafik</h1>
+        <p class="brand-sub" data-i18n="appSubtitle"></p>
+      </div>
+    </div>
+
+    <div class="topbar-controls">
+      <div class="control-group">
+        <label for="presetSelect" data-i18n="presetLabel">Örnek Gen</label>
+        <select id="presetSelect" class="select-input"></select>
+      </div>
+
+      <div class="control-group">
+        <span class="group-label" data-i18n="organismLabel">Organizma</span>
+        <div id="organismToggle" class="segmented" role="group">
+          <button type="button" data-org="human" class="seg-btn active">H. sapiens</button>
+          <button type="button" data-org="ecoli" class="seg-btn">E. coli</button>
+          <button type="button" data-org="yeast" class="seg-btn">S. cerevisiae</button>
+        </div>
+      </div>
+
+      <button type="button" id="openFastaBtn" class="btn btn-outline" data-i18n="customFastaBtn">
+        Özel FASTA / Domain
+      </button>
+
+      <div class="export-dropdown">
+        <button type="button" id="exportMenuBtn" class="btn btn-outline" data-i18n="exportBtn">
+          Dışa Aktar ▾
+        </button>
+        <div id="exportMenu" class="dropdown-menu hidden">
+          <button type="button" id="exportFastaBtn" data-i18n="exportFasta"></button>
+          <button type="button" id="exportCsvBtn" data-i18n="exportCsv"></button>
+          <button type="button" id="exportJsonBtn" data-i18n="exportJson"></button>
+        </div>
+      </div>
+
+      <div class="segmented lang-switch" role="group">
+        <button type="button" data-lang="tr" class="seg-btn active">TR</button>
+        <button type="button" data-lang="en" class="seg-btn">EN</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- Preset description banner -->
+    <section class="preset-banner">
+      <p id="presetDesc"></p>
+    </section>
+
+    <!-- 4 KPI Instrument Cards -->
+    <section class="kpi-grid">
+      <article class="kpi-card">
+        <div class="kpi-header">
+          <span class="kpi-title" data-i18n="kpiFluxTitle">Protein Çevrim Akısı (J)</span>
+          <span id="kpiFluxDelta" class="badge badge-neutral">0%</span>
+        </div>
+        <div class="kpi-value-row">
+          <span id="kpiFluxVal" class="kpi-value">0.0</span>
+          <span class="kpi-unit" data-i18n="kpiFluxUnit">protein / dk</span>
+        </div>
+        <div id="kpiFluxSub" class="kpi-sub"></div>
+      </article>
+
+      <article class="kpi-card">
+        <div class="kpi-header">
+          <span class="kpi-title" data-i18n="kpiRqcTitle">Dizom Çarpışması &amp; RQC Riski</span>
+          <span id="kpiRqcBadge" class="badge badge-safe">Güvenli</span>
+        </div>
+        <div class="kpi-value-row">
+          <span id="kpiRqcVal" class="kpi-value">0</span>
+          <span class="kpi-unit" data-i18n="kpiRqcUnit">/ 100</span>
+        </div>
+        <div id="kpiRqcSub" class="kpi-sub"></div>
+      </article>
+
+      <article class="kpi-card">
+        <div class="kpi-header">
+          <span class="kpi-title" data-i18n="kpiFoldTitle">Katlanma Penceresi Skoru</span>
+          <span id="kpiFoldBadge" class="badge badge-safe">Optimal</span>
+        </div>
+        <div class="kpi-value-row">
+          <span id="kpiFoldVal" class="kpi-value">--</span>
+          <span class="kpi-unit" data-i18n="kpiFoldUnit">/ 100</span>
+        </div>
+        <div id="kpiFoldSub" class="kpi-sub"></div>
+      </article>
+
+      <article class="kpi-card">
+        <div class="kpi-header">
+          <span class="kpi-title" data-i18n="kpiIdentityTitle">Protein Özdeşliği &amp; CAI</span>
+          <span id="kpiIdentityBadge" class="badge badge-teal" data-i18n="kpiIdentityUnit">%100 Özdeş</span>
+        </div>
+        <div class="kpi-value-row">
+          <span id="kpiIdentityVal" class="kpi-value">100%</span>
+        </div>
+        <div id="kpiIdentitySub" class="kpi-sub"></div>
+      </article>
+    </section>
+
+    <!-- Live Ribosome Highway Card -->
+    <section class="panel">
+      <div class="panel-header">
+        <h2 class="panel-title" data-i18n="highwayTitle">Canlı Ribozom Otoyolu</h2>
+        <div class="optimizer-actions">
+          <button type="button" id="btnOptimize" class="btn btn-primary" data-i18n="btnOptimize">
+            RiboTrafik Optimize
+          </button>
+          <button type="button" id="btnMaxCai" class="btn btn-secondary" data-i18n="btnMaxCai">
+            Max-CAI (Klasik)
+          </button>
+          <button type="button" id="btnResetSeq" class="btn btn-ghost" data-i18n="btnResetSeq">
+            Orijinale Dön
+          </button>
+        </div>
+      </div>
+
+      <div class="toolbar">
+        <div class="toolbar-left">
+          <button type="button" id="btnPlayPause" class="btn btn-sm btn-dark">⏸ <span data-i18n="pause">Duraklat</span></button>
+          <button type="button" id="btnResetSim" class="btn btn-sm btn-outline" data-i18n="resetSim">Sıfırla</button>
+          <div class="speed-group">
+            <span class="toolbar-label" data-i18n="speedLabel">Hız</span>
+            <button type="button" class="speed-btn" data-speed="0.5">0.5×</button>
+            <button type="button" class="speed-btn active" data-speed="1">1×</button>
+            <button type="button" class="speed-btn" data-speed="2">2×</button>
+            <button type="button" class="speed-btn" data-speed="4">4×</button>
+          </div>
+        </div>
+
+        <div class="toolbar-center">
+          <label for="alphaSlider" class="toolbar-label">
+            <span data-i18n="alphaLabel">Başlatma Hızı (α)</span>:
+            <strong id="alphaVal" class="mono">0.55</strong> <span data-i18n="alphaUnit">s⁻¹</span>
+          </label>
+          <input id="alphaSlider" type="range" min="0.10" max="1.60" step="0.05" value="0.55" />
+        </div>
+
+        <div class="toolbar-right">
+          <label class="chip-toggle">
+            <input type="checkbox" id="chkCharge" checked />
+            <span data-i18n="toggleCharge">+Q Tünel</span>
+          </label>
+          <label class="chip-toggle">
+            <input type="checkbox" id="chkPolyPro" checked />
+            <span data-i18n="togglePolyPro">PP Prolin</span>
+          </label>
+          <label class="chip-toggle">
+            <input type="checkbox" id="chkHairpin" checked />
+            <span data-i18n="toggleHairpin">Hairpin</span>
+          </label>
+        </div>
+      </div>
+
+      <div class="canvas-wrap highway-wrap">
+        <canvas id="highwayCanvas"></canvas>
+        <div id="highwayTooltip" class="canvas-tooltip hidden"></div>
+      </div>
+    </section>
+
+    <!-- Synchronized Ribo-Seq & Speed Charts -->
+    <section class="panel">
+      <div class="panel-header">
+        <h2 class="panel-title" data-i18n="chartTitle">Senkronize Sentetik Ribo-Seq &amp; Uzama Hızı</h2>
+        <div class="chart-legend">
+          <span><i class="leg-box leg-teal"></i><span data-i18n="legendOcc"></span></span>
+          <span><i class="leg-box leg-red"></i><span data-i18n="legendColl"></span></span>
+          <span><i class="leg-line leg-ink"></i><span data-i18n="legendSpeed"></span></span>
+          <span><i class="leg-box leg-amber"></i><span data-i18n="legendWindow"></span></span>
+          <span><i class="leg-dot leg-purple"></i><span data-i18n="legendStall"></span></span>
+        </div>
+      </div>
+      <div class="canvas-wrap chart-wrap">
+        <canvas id="chartsCanvas"></canvas>
+        <div id="chartsTooltip" class="canvas-tooltip hidden"></div>
+      </div>
+    </section>
+
+    <!-- Bottom 2-Column Interactive Codon Grid & Synonymous Sculptor -->
+    <section class="sculptor-layout">
+      <article class="panel">
+        <div class="panel-header">
+          <h2 class="panel-title" data-i18n="gridTitle">İnteraktif Kodon Izgarası</h2>
+          <span class="panel-hint" data-i18n="gridHint"></span>
+        </div>
+        <div id="codonGrid" class="codon-grid"></div>
+      </article>
+
+      <aside class="panel sculptor-panel">
+        <div class="panel-header">
+          <h2 class="panel-title" data-i18n="sculptorTitle">Eşanlamlı Kodon Heykeltıraşı</h2>
+        </div>
+        <div id="sculptorBody" class="sculptor-body">
+          <p class="sculptor-empty" data-i18n="sculptorSelectHint"></p>
+        </div>
+      </aside>
+    </section>
+
+    <!-- Methodology Note -->
+    <section class="panel method-panel">
+      <h2 class="panel-title" data-i18n="methodTitle"></h2>
+      <p class="method-text" data-i18n="methodBody"></p>
+    </section>
+  </main>
+
+  <!-- Custom FASTA & Domain Modal -->
+  <div id="fastaModal" class="modal-backdrop hidden" role="dialog" aria-modal="true">
+    <div class="modal-card">
+      <h3 class="modal-title" data-i18n="modalTitle"></h3>
+      <label class="modal-label" for="fastaInput" data-i18n="modalSeqLabel"></label>
+      <textarea id="fastaInput" class="modal-textarea mono" rows="6"></textarea>
+      <label class="modal-label" for="domainsInput" data-i18n="modalDomLabel"></label>
+      <textarea id="domainsInput" class="modal-textarea mono" rows="3"></textarea>
+      <p id="fastaError" class="modal-error hidden"></p>
+      <div class="modal-actions">
+        <button type="button" id="cancelFastaBtn" class="btn btn-ghost" data-i18n="modalCancel"></button>
+        <button type="button" id="applyFastaBtn" class="btn btn-primary" data-i18n="modalApply"></button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>
